@@ -1,0 +1,27 @@
+commit 7f3e9a1c4b2d8e6f0a5c9b3d1e7f2a4c6b8d0e1f
+Author: lena
+Date:   2026-11-12 13:41 UTC
+Deployed: catalog-api 2.40.3 -> 2.41.0, rolling, finished 2026-11-12 14:02:31 UTC
+
+    Rename the 'Continue watching' row to 'Pick up where you left off'
+
+    Product asked for a warmer label (UX-418). Copy change only.
+
+diff --git a/locales/en.json b/locales/en.json
+@@ -12,7 +12,7 @@
+   "rows.trending": "Trending now",
+-  "rows.continue_watching": "Continue watching",
++  "rows.continue_watching": "Pick up where you left off",
+   "rows.because_you_watched": "Because you watched {title}",
+diff --git a/locales/es.json b/locales/es.json
+@@ -12,7 +12,7 @@
+   "rows.trending": "Tendencias",
+-  "rows.continue_watching": "Seguir viendo",
++  "rows.continue_watching": "Retoma donde lo dejaste",
+   "rows.because_you_watched": "Porque viste {title}",
+diff --git a/tests/snapshots/home_rows.json b/tests/snapshots/home_rows.json
+@@ -3,7 +3,7 @@
+     {"id": "trending", "title": "Trending now"},
+-    {"id": "continue_watching", "title": "Continue watching"},
++    {"id": "continue_watching", "title": "Pick up where you left off"},
+     {"id": "because_you_watched", "title": "Because you watched Night Shift"},

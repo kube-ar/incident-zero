@@ -1,0 +1,9 @@
+INCIDENT #0 · SEV-2 · triggered 2026-11-12 14:08 UTC · on call: you
+
+[FIRING] gateway: 5xx error rate 25.0% over the last 2 minutes (threshold 2%)
+Service: gateway (the public API in front of every Reelvane app)
+First 5xx: 14:05 UTC
+
+Message from Dana (support lead) in #incidents, 14:09 UTC:
+"Customers can't load the home screen on any app. Our API started returning 500s
+right after the last deployment. Can you take a look?"

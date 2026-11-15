@@ -1,0 +1,40 @@
+[
+  {
+    "id": "CHG-2044",
+    "at": "2026-11-12T14:05:48Z",
+    "kind": "config",
+    "service": "catalog-api",
+    "author": "tomas",
+    "summary": "Trim idle database connections on catalog-api (OPS-2291)"
+  },
+  {
+    "id": "CHG-2043",
+    "at": "2026-11-12T14:02:31Z",
+    "kind": "deploy",
+    "service": "catalog-api",
+    "version": "2.41.0",
+    "previous_version": "2.40.3",
+    "author": "lena",
+    "summary": "Rename the 'Continue watching' row to 'Pick up where you left off'"
+  },
+  {
+    "id": "CHG-2042",
+    "at": "2026-11-12T13:21:55Z",
+    "kind": "deploy",
+    "service": "recommendations",
+    "version": "1.9.2",
+    "previous_version": "1.9.1",
+    "author": "amira",
+    "summary": "Cache 'Because you watched' rows for 10 minutes"
+  },
+  {
+    "id": "CHG-2041",
+    "at": "2026-11-12T09:14:02Z",
+    "kind": "deploy",
+    "service": "playback-api",
+    "version": "3.18.0",
+    "previous_version": "3.17.4",
+    "author": "joon",
+    "summary": "Add Brazilian Portuguese to the subtitle picker"
+  }
+]

@@ -1,0 +1,19 @@
+commit 2b8d4f6a0c1e3a5b7d9f1e3c5a7b9d0f2e4a6c8b
+Author: amira
+Date:   2026-11-12 12:55 UTC
+Deployed: recommendations 1.9.1 -> 1.9.2, rolling, finished 2026-11-12 13:21:55 UTC
+
+    Cache 'Because you watched' rows for 10 minutes
+
+    The row is rebuilt on every home screen load; viewers rarely finish a title in 10 minutes.
+
+diff --git a/src/rows/because_you_watched.py b/src/rows/because_you_watched.py
+@@ -1,6 +1,8 @@
++from functools import partial
++from ..cache import cached
+
+-def because_you_watched(profile_id: str, title_id: str) -> list[str]:
++@partial(cached, ttl_s=600)
++def because_you_watched(profile_id: str, title_id: str) -> list[str]:
+     neighbours = similar_titles(title_id, k=40)
+     return rank_for_profile(profile_id, neighbours)[:12]

@@ -1,0 +1,16 @@
+commit 9c1a3e5b7d0f2a4c6e8b1d3f5a7c9e0b2d4f6a8c
+Author: joon
+Date:   2026-11-12 08:50 UTC
+Deployed: playback-api 3.17.4 -> 3.18.0, rolling, finished 2026-11-12 09:14:02 UTC
+
+    Add Brazilian Portuguese to the subtitle picker
+
+diff --git a/src/subtitles/languages.py b/src/subtitles/languages.py
+@@ -9,6 +9,7 @@ LANGUAGES = {
+     "fr": "Français",
+     "it": "Italiano",
+     "pt": "Português",
++    "pt-BR": "Português (Brasil)",
+     "es": "Español",
+     "es-419": "Español (Latinoamérica)",
+ }
