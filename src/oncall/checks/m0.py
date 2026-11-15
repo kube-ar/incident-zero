@@ -43,7 +43,7 @@ def _call_text(tool: str, arguments: dict) -> str:
 def run(module: ModuleType, llm: Any = None) -> list[Result]:
     stops = Result("The loop stops on its own", L_LOOP)
     looks = Result("It looks before it answers", L_TOOLS)
-    cause = Result("The cause, not the last deploy", L_STOP)
+    cause = Result("The right cause", L_STOP)
     evidence = Result("Evidence from the logs", L_STOP)
     results = [stops, looks, cause, evidence]
 

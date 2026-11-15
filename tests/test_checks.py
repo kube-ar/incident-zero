@@ -20,7 +20,7 @@ from oncall.milestones import MILESTONES
 ALL = {
     "The loop stops on its own",
     "It looks before it answers",
-    "The cause, not the last deploy",
+    "The right cause",
     "Evidence from the logs",
 }
 
@@ -55,14 +55,14 @@ def test_answering_without_looking_fails():
 
 
 def test_blaming_the_last_deploy_fails():
-    assert failing(reference(), BlameTheDeploy()) == {"The cause, not the last deploy", "Evidence from the logs"}
+    assert failing(reference(), BlameTheDeploy()) == {"The right cause", "Evidence from the logs"}
     assert "CHG-2043 is the last deployment" in details(reference(), BlameTheDeploy())
 
 
 def test_a_model_that_never_stops_hits_the_turn_limit():
     assert failing(reference(), Endless()) == {
         "The loop stops on its own",
-        "The cause, not the last deploy",
+        "The right cause",
         "Evidence from the logs",
     }
     assert "the turn limit stopped the run (15 turns)" in details(reference(), Endless())
