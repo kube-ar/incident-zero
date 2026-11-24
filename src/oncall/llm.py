@@ -24,6 +24,7 @@ import hashlib
 import json
 import os
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -79,6 +80,7 @@ class Usage:
     cached: int = 0  # answers read from .oncall-cache instead of calling the provider
     input_tokens: int = 0
     output_tokens: int = 0
+    contexts: list[int] = field(default_factory=list)  # characters of conversation each Conversation request sent
 
 
 @dataclass
@@ -304,6 +306,49 @@ class Conversation:
         self.llm, self.tools, self.system = llm, tools, system
         self.messages: list[Any] = []
         self.transcript: list[dict] = []  # provider-neutral, for logs and execution records
+        self._shrunk: set[str] = set()
+
+    def compact(self, shrink: Callable[[str, dict, str], str], keep_last: int = 2) -> int:
+        """Shrink the results of tool calls made before the last `keep_last` model turns.
+
+        Each old result becomes shrink(tool name, arguments, result text), once: a result already
+        shrunk is left alone. Call it before `reply`. Returns how many characters it saved.
+
+        Every later request sends less; the provider's prompt cache is broken from the first
+        message that changed, so compacting in batches (keep_last=3 or 4) keeps more of it.
+        """
+        calls: dict[str, tuple[int, str, dict]] = {}
+        turn = 0
+        for entry in self.transcript:
+            if entry["role"] == "assistant":
+                turn += 1
+                for c in entry["tool_calls"]:
+                    calls[c["id"]] = (turn, c["name"], c["arguments"])
+        cutoff = turn - keep_last
+        saved = 0
+
+        def new_text(cid: str, old: str) -> str | None:
+            nonlocal saved
+            if cid in self._shrunk or cid not in calls or calls[cid][0] > cutoff:
+                return None
+            _, name, arguments = calls[cid]
+            text = str(shrink(name, arguments, old))
+            self._shrunk.add(cid)
+            saved += len(old) - len(text)
+            return text
+
+        for message in self.messages:
+            if isinstance(message, dict) and message.get("role") == "tool":
+                text = new_text(message["tool_call_id"], message["content"])
+                if text is not None:
+                    message["content"] = text
+            elif isinstance(message, dict) and message.get("role") == "user" and isinstance(message["content"], list):
+                for block in message["content"]:
+                    if isinstance(block, dict) and block.get("type") == "tool_result":
+                        text = new_text(block["tool_use_id"], block["content"])
+                        if text is not None:
+                            block["content"] = text
+        return saved
 
     def send(self, text: str) -> Turn:
         self.transcript.append({"role": "user", "text": text})
@@ -328,11 +373,31 @@ class Conversation:
         return self._step()
 
     def _step(self) -> Turn:
+        self.llm.usage.contexts.append(self.context_chars())
         turn = self._claude() if self.llm.provider.name == "anthropic" else self._openai_compatible()
         self.transcript.append(
             {"role": "assistant", "text": turn.text, "tool_calls": [c.__dict__ for c in turn.tool_calls]}
         )
         return turn
+
+    def context_chars(self) -> int:
+        """Characters of conversation the next request sends: every message so far, tool results included."""
+        total = 0
+        for m in self.messages:
+            content = m.get("content") if isinstance(m, dict) else None
+            if isinstance(content, str):
+                total += len(content)
+            elif isinstance(content, list):
+                for block in content:
+                    if isinstance(block, dict):
+                        total += len(str(block.get("content") or block.get("text") or ""))
+                    else:
+                        total += len(getattr(block, "text", "") or "") + len(
+                            json.dumps(getattr(block, "input", None) or {})
+                        )
+            if isinstance(m, dict) and m.get("tool_calls"):
+                total += sum(len(c["function"]["arguments"]) for c in m["tool_calls"])
+        return total
 
     def _claude(self) -> Turn:
         import anthropic

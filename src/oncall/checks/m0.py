@@ -40,7 +40,7 @@ def _call_text(tool: str, arguments: dict) -> str:
     return f"{tool}({inside[:60]}{'…' if len(inside) > 60 else ''})"
 
 
-def run(module: ModuleType, llm: Any = None) -> list[Result]:
+def run(module: ModuleType, llm: Any = None, no_llm: bool = False) -> list[Result]:
     stops = Result("The loop stops on its own", L_LOOP)
     looks = Result("It looks before it answers", L_TOOLS)
     cause = Result("The right cause", L_STOP)
@@ -52,6 +52,9 @@ def run(module: ModuleType, llm: Any = None) -> list[Result]:
             r.started = r.passed = False
         return results
 
+    if no_llm:
+        stops.notes.append("Skipped (--no-llm): every check of milestone 0 runs your loop with your LLM.")
+        return not_started()
     if llm is None:
         llm = needs_llm(stops)
         if llm is None:

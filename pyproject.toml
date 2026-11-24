@@ -1,6 +1,6 @@
 [project]
 name = "incident-zero"
-version = "0.1.0"
+version = "0.2.0"
 description = "An on-call agent that finds why a streaming service broke. Was it the deployment?"
 readme = "README.md"
 license = "MIT"

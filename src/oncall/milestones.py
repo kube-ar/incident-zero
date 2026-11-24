@@ -39,6 +39,7 @@ MILESTONES = {
     m.id: m
     for m in [
         _m(0, "was-it-the-deploy", "Was it the deploy?"),
+        _m(1, "the-first-page", "The first page"),
     ]
 }
 
