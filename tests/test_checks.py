@@ -124,9 +124,15 @@ def test_nothing_runs_without_an_llm(monkeypatch):
 UPSTREAM = os.environ.get("GITHUB_REPOSITORY", "") == "kube-ar/incident-zero" or os.environ.get("ONCALL_UPSTREAM")
 
 
+# Checks a stub starts on purpose: milestone 1's check_runbook passes every runbook until it's written, so
+# the learner can watch the workflow give a confident wrong answer on p6 first.
+STARTED_BY_DESIGN = {"1": {"Stale runbooks caught"}}
+
+
 @pytest.mark.skipif(not UPSTREAM, reason="your copy has your code in the starter files, not the stubs")
 @pytest.mark.parametrize("mid", sorted(MILESTONES))
 def test_starter_is_not_started(mid):
     m = MILESTONES[mid]
     results = importlib.import_module(m.checks).run(load(ROOT / m.file), scripted(Careful()))
-    assert all(not r.started for r in results)
+    expected = STARTED_BY_DESIGN.get(mid, set())
+    assert {r.name for r in results if r.started} == expected
